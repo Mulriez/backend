@@ -1,0 +1,17 @@
+{
+  "name": "nodejs-basic",
+  "version": "1.0.0",
+  "description": "belajar nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "shin",
+  "license": "ISC",
+  "dependencies": {
+    "dayjs": "^1.11.7",
+    "moment": "^2.29.4"
+  }
+}
