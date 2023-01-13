@@ -1,13 +1,13 @@
 const express = require("express")
 const app = express()
-const routers = require("./router")
+// const routers = require("./router")
 const port = 8080
 
-app.use(routers)
+// app.use(routers)
 
-// app.get("/", (req,res) => {
-//   res.end("Hello World")
-// });
+app.get("/", (req,res) => {
+  res.end("Hello World")
+});
 // app.get("/user", (req,res) => {
 //   res.send({
 //     status : "success",
@@ -47,8 +47,8 @@ app.use(routers)
 //   })
 // })
 
-// app.listen(port, () => console.log(`Running in http://localhost:${port}`))
+app.listen(port, () => console.log(`Running in http://localhost:${port}`))
 
-app.listen(port, function (){
-  return console.log(`running in ${port}`);
-})
+// app.listen(port, function (){
+//   return console.log(`running in ${port}`);
+// })
