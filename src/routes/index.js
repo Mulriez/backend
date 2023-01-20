@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
+const uploadMulti = require("../storage/fileUploadMulti");
+const uploadSingle = require("../storage/fileUploadSingle");
 // const multer = require("multer")
 // const fs = require("fs")
 // const path = require("path")
@@ -9,7 +11,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.get("/", (req, res) => {
   res.send("Hello World");
 });
-router.post("/post",(req, res) => {
+router.post("/post", (req, res) => {
   res.send({
     status: "success",
     message: "Running in Post",
@@ -32,59 +34,47 @@ router.delete("/delete", (req, res) => {
     message: "Running in Delete",
   });
 });
-router.patch(
-  "/nilai/:nama",
-  (req, res) => {
-    let { nama } = req.params;
-    let {matematika, fisika, kimia} = req.query
-    res.send({
-      status: "success",
-      message: `nilai ${nama} adalah matematika ${matematika}, fisika ${fisika}, kimia ${kimia} `,
-    });
-  }
-);
-router.get(
-  "/absensi/:nama",
-  (req, res) => {
-    let { nama } = req.params;
-    let {status, dari_tanggal, sampai_tanggal} = req.query
-    res.send({
-      status: "success",
-      data:{
-        nama: nama,
-        status: status,
-        dari_tanggal: dari_tanggal,
-        sampai_tanggal: sampai_tanggal
-      }
-    });
-  }
-);
-router.get(
-  "/user",
-  (req, res) => {
-    let {nama,kelas} = req.body
-    res.send({
-      status: "200 mah sukses",
-      message: "success",
-      data:{
-        nama: nama,
-        kelas: kelas,
-      }
-    });
-  }
-);
-router.post(
-  "/user/create",
-  (req, res) => {
-    const payload = req.body
-    let {nama,kelas} = req.body
-    res.json({
-      status: "Success",
-      message: "Latihan Request Body",
-      payload: payload
-    });
-  }
-);
+router.patch("/nilai/:nama", (req, res) => {
+  let { nama } = req.params;
+  let { matematika, fisika, kimia } = req.query;
+  res.send({
+    status: "success",
+    message: `nilai ${nama} adalah matematika ${matematika}, fisika ${fisika}, kimia ${kimia} `,
+  });
+});
+router.get("/absensi/:nama", (req, res) => {
+  let { nama } = req.params;
+  let { status, dari_tanggal, sampai_tanggal } = req.query;
+  res.send({
+    status: "success",
+    data: {
+      nama: nama,
+      status: status,
+      dari_tanggal: dari_tanggal,
+      sampai_tanggal: sampai_tanggal,
+    },
+  });
+});
+router.get("/user", (req, res) => {
+  let { nama, kelas } = req.body;
+  res.send({
+    status: "200 mah sukses",
+    message: "success",
+    data: {
+      nama: nama,
+      kelas: kelas,
+    },
+  });
+});
+router.post("/user/create", (req, res) => {
+  const payload = req.body;
+  // let { nama, kelas } = req.body;
+  res.json({
+    status: "Success",
+    message: "Latihan Request Body",
+    payload: payload,
+  });
+});
 
 // query params ketika wajib diisi
 router.get("/siswa/:nama/:sekolah", (req, res) => {
@@ -112,6 +102,31 @@ router.get("/siswa/:nama", (req, res) => {
   });
 });
 
+router.post("/upload/single", uploadSingle, (req, res) => {
+  res.send({
+    status: "success",
+    message: "Upload Success",
+    file: req.file,
+    fileURL: `${req.protocol}://${req.get("host")}/${req.file.filename}`,
+  });
+});
+
+router.post("/upload/multi", uploadMulti, (req, res) => {
+  const files = req.files;
+  const url = files.map((file, index) => {
+    return `${req.protocol}://${req.get("host")}/${req.files[index].filename}`;
+  });
+
+  res.send({
+    status: 200,
+    message: "Upload Success",
+    data: {
+      file: req.files,
+      fileURL: [url],
+    },
+  });
+});
+
 // router.post("/upload", upload.single("file"),(req,res)=>{
 //   const file = req.file
 //   if (file) {
@@ -128,6 +143,5 @@ router.get("/siswa/:nama", (req, res) => {
 //     })
 //   }
 // })
-
 
 module.exports = router;
