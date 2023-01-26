@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.static("src/storage/uploads"));
 // app.use(authMiddleware);
 app.use(log);
-app.use(log2);
+// app.use(log2);
 app.use(router);
 app.use(notfound);
 // app.use(errorHandle);

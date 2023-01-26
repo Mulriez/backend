@@ -1,147 +1,70 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middleware/authMiddleware");
-const uploadMulti = require("../storage/fileUploadMulti");
-const uploadSingle = require("../storage/fileUploadSingle");
-// const multer = require("multer")
-// const fs = require("fs")
-// const path = require("path")
-// const upload = multer({dest:"public"})
+const {
+  getListUser,
+  createUser,
+  getDetailUserById,
+  getDetailUserByParams,
+  updateUser,
+  deleteUser,
+} = require("../controllers/userController");
+const {
+  getProdList,
+  createProd,
+  getDetailProdByParams,
+  getDetailProdById,
+  updateProd,
+} = require("../controllers/produkController");
+const validationResultMiddleware = require("../middleware/validationResultMiddleware");
+//use filename+fuction
+const UserValidator = require("../validators/userValidator");
+const ProdukValidator = require("../validators/produkValidator");
+const jwtValidateMiddleware = require("../middleware/jwtValidateMiddleware");
+const { register, login } = require("../controllers/authController");
 
-router.get("/", (req, res) => {
-  res.send("Hello World");
-});
-router.post("/post", (req, res) => {
-  res.send({
-    status: "success",
-    message: "Running in Post",
-  });
-});
+//urutan (Untuk pembacaan code dari atas ke bawah)berpenaruh
+//produk
+router.get("/produk/list", getProdList),
+  router.get("/produk/detail/:id", getDetailProdById),
+  router.get("/produk/list/:brand", getDetailProdByParams),
+  router.post(
+    "/produk/create",
+    ProdukValidator.createProdValidator,
+    validationResultMiddleware,
+    createProd
+  ),
+  router.put(
+    "/produk/update/:id",
+    ProdukValidator.updateUserValidator,
+    validationResultMiddleware,
+    updateProd
+  ),
 
-//urutan berpengaruh untuk middleware jika callback berada dibawah command midlleware
-//maka callback akan dibatasi
-// router.use(authMiddleware)
+//register
+router.post("/register", register);
+//login
+router.post("/login", login);
 
-router.put("/put", (req, res) => {
-  res.send({
-    status: "success",
-    message: "Running in Put",
-  });
-});
-router.delete("/delete", (req, res) => {
-  res.send({
-    status: "success",
-    message: "Running in Delete",
-  });
-});
-router.patch("/nilai/:nama", (req, res) => {
-  let { nama } = req.params;
-  let { matematika, fisika, kimia } = req.query;
-  res.send({
-    status: "success",
-    message: `nilai ${nama} adalah matematika ${matematika}, fisika ${fisika}, kimia ${kimia} `,
-  });
-});
-router.get("/absensi/:nama", (req, res) => {
-  let { nama } = req.params;
-  let { status, dari_tanggal, sampai_tanggal } = req.query;
-  res.send({
-    status: "success",
-    data: {
-      nama: nama,
-      status: status,
-      dari_tanggal: dari_tanggal,
-      sampai_tanggal: sampai_tanggal,
-    },
-  });
-});
-router.get("/user", (req, res) => {
-  let { nama, kelas } = req.body;
-  res.send({
-    status: "200 mah sukses",
-    message: "success",
-    data: {
-      nama: nama,
-      kelas: kelas,
-    },
-  });
-});
-router.post("/user/create", (req, res) => {
-  const payload = req.body;
-  // let { nama, kelas } = req.body;
-  res.json({
-    status: "Success",
-    message: "Latihan Request Body",
-    payload: payload,
-  });
-});
+//implementasi jwt middleware
+router.use(jwtValidateMiddleware);
 
-// query params ketika wajib diisi
-router.get("/siswa/:nama/:sekolah", (req, res) => {
-  // let nama = req.params.nama
-  // let sekolah = req.params.sekolah
+//user
+router.get("/user/list", getListUser),
+  router.get("/user/detail/:id", getDetailUserById),
+  router.get("/user/list/:email", getDetailUserByParams),
+  router.post(
+    "/user/create",
+    UserValidator.createUserValidator,
+    validationResultMiddleware,
+    createUser
+  ),
+  router.put(
+    "/user/update/:id",
+    UserValidator.updateUserValidator,
+    validationResultMiddleware,
+    updateUser
+  ),
+  router.delete("/user/delete/:id", deleteUser);
 
-  let { nama, sekolah } = req.params;
-  res.send({
-    status: "success",
-    message: `Nama beliau ${nama} & bersekolah di ${sekolah}`,
-  });
-});
 
-//query string bebas(dinamis)
-router.get("/siswa/:nama", (req, res) => {
-  // let nama = req.params.nama
-  // let sekolah = req.params.sekolah
-
-  let { nama } = req.params;
-  let { kelas = "X", sekolah = "MQ" } = req.query;
-  //bisa diisi nilai default
-  res.send({
-    status: "success",
-    message: `Nama beliau ${nama} duduk di kelas ${kelas} di ${sekolah}`,
-  });
-});
-
-router.post("/upload/single", uploadSingle, (req, res) => {
-  res.send({
-    status: "success",
-    message: "Upload Success",
-    file: req.file,
-    fileURL: `${req.protocol}://${req.get("host")}/${req.file.filename}`,
-  });
-});
-
-router.post("/upload/multi", uploadMulti, (req, res) => {
-  const files = req.files;
-  const url = files.map((file, index) => {
-    return `${req.protocol}://${req.get("host")}/${req.files[index].filename}`;
-  });
-
-  res.send({
-    status: 200,
-    message: "Upload Success",
-    data: {
-      file: req.files,
-      fileURL: [url],
-    },
-  });
-});
-
-// router.post("/upload", upload.single("file"),(req,res)=>{
-//   const file = req.file
-//   if (file) {
-//     const target = path.join(__dirname, "public", file.originalname);
-//     fs.renameSync(file.path, target)
-//     res.send({
-//       status: "success",
-//       message: "berhasiel upload"
-//     })
-//   }else{
-//     res.send({
-//       status: "Fail",
-//       message: "gagal upload"
-//     })
-//   }
-// })
-
-module.exports = router;
+  module.exports = router;
