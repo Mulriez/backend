@@ -30,5 +30,10 @@ const registerValidator = [
     .isLength({ min: 1 })
     .withMessage("Wajib isi, minimal satu lah..."),
 ];
+const updateValidator = [
+  check("new_password")
+    .isLength({ min: 8 })
+    .withMessage("password minimal 8 char"),
+];
 
-module.exports = { createUserValidator, updateUserValidator };
+module.exports = { createUserValidator, updateUserValidator, updateValidator };

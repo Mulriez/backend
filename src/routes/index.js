@@ -20,7 +20,22 @@ const validationResultMiddleware = require("../middleware/validationResultMiddle
 const UserValidator = require("../validators/userValidator");
 const ProdukValidator = require("../validators/produkValidator");
 const jwtValidateMiddleware = require("../middleware/jwtValidateMiddleware");
-const { register, login } = require("../controllers/authController");
+const {
+  register,
+  login,
+  updatePassword,
+  lupaPassword,
+  resetPassword,
+} = require("../controllers/authController");
+const {
+  createArtikel,
+  getAll,
+  updateArtikel,
+  deleteteArtikel,
+  createArtikelBulk,
+  createArtikelMulti,
+  deleteMulti,
+} = require("../controllers/artikelController");
 
 //urutan (Untuk pembacaan code dari atas ke bawah)berpenaruh
 //produk
@@ -39,11 +54,19 @@ router.get("/produk/list", getProdList),
     validationResultMiddleware,
     updateProd
   ),
-
-//register
-router.post("/register", register);
+  //register
+  router.post("/register", register);
 //login
 router.post("/login", login);
+//update password
+router.post("/lupa-password", lupaPassword);
+router.post(
+  "/update-password",
+  UserValidator.updateValidator,
+  validationResultMiddleware,
+  updatePassword
+);
+router.post("/reset-password/:id/:token", resetPassword);
 
 //implementasi jwt middleware
 router.use(jwtValidateMiddleware);
@@ -65,6 +88,13 @@ router.get("/user/list", getListUser),
     updateUser
   ),
   router.delete("/user/delete/:id", deleteUser);
+//artikel
+router.get("/artikel/list", getAll);
+router.post("/artikel/create/bulk", createArtikelBulk);
+router.post("/artikel/create/multi", createArtikelMulti);
+router.post("/artikel/create", createArtikel);
+router.put("/artikel/update/:id", updateArtikel);
+router.delete("/artikel/delete/:id", deleteteArtikel);
+router.delete("/artikel/multi/delete", deleteMulti);
 
-
-  module.exports = router;
+module.exports = router;
