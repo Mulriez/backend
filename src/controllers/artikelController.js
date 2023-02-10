@@ -1,5 +1,6 @@
 const { promise } = require("bcrypt/promises");
 const { where } = require("sequelize");
+const { Op } = require("sequelize");
 const ArtikelModel = require("../models").artikel;
 
 async function createArtikel(req, res) {
@@ -75,7 +76,7 @@ async function deleteMulti(req, res) {
             },
           });
           if (title.userId !== req.id) {
-            return fail = fail + 1
+            return (fail = fail + 1);
           }
           await ArtikelModel.destroy({
             where: { id: item.id },
@@ -120,15 +121,46 @@ async function createArtikelBulk(req, res) {
 
 async function getAll(req, res) {
   try {
-    const artikel = await ArtikelModel.findAll({
-      where: {
-        userId: req.id,
+    const { page, pageSize, offset, keyword, year, sortBy = "id", orderBy = "desc" } = req.query;
+    const artikel = await ArtikelModel.findAndCountAll({
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
       },
+      // where: {
+      //   [Op.or]: [
+      //     {
+      //       title: {
+      //         [Op.substring]: keyword,
+      //       },
+      //     },
+      //     {
+      //       description: {
+      //         [Op.substring]: keyword,
+      //       },
+      //     },
+      //   ],
+      //   year:{
+      //     [Op.gte]: year
+      //   }
+      // },
+      order: [[sortBy,orderBy]],
+      limit: pageSize,
+      offset: offset,
+      //offset bukan page
     });
     res.json({
       status: "Success",
       msg: "Ditemukan",
+      pagination: {
+        currentPage: page,
+        pageSize: pageSize,
+        totalData: artikel.count
+      },
       data: artikel,
+      query: {
+        pageSize,
+        page,
+      },
     });
   } catch (error) {
     res.status(403).json({
@@ -137,6 +169,60 @@ async function getAll(req, res) {
     });
   }
 }
+
+// async function getAll(req, res) {
+//   try {
+//     const { title, dari_tahun, sampai_tahun } = req.query;
+//     const artikel = await ArtikelModel.findAll({
+//       attributes: {
+//         exclude: ["id", "createdAt", "updatedAt"],
+//       },
+//       where: {
+//         title: {
+//           [Op.substring]: title,
+//         },
+//         year: {
+//           [Op.between]: [dari_tahun, sampai_tahun],
+//         },
+//       },
+//     });
+//     res.json({
+//       status: "Success",
+//       msg: "Ditemukan",
+//       data: artikel,
+//       query: {
+//         title,
+//         dari_tahun,
+//         sampai_tahun,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(403).json({
+//       status: "Fail",
+//       msg: "Artikel Tidak Ditemukan",
+//     });
+//   }
+// }
+
+// async function getAll(req, res) {
+//   try {
+//     const artikel = await ArtikelModel.findAll({
+//       where: {
+//         userId: req.id,
+//       },
+//     });
+//     res.json({
+//       status: "Success",
+//       msg: "Ditemukan",
+//       data: artikel,
+//     });
+//   } catch (error) {
+//     res.status(403).json({
+//       status: "Fail",
+//       msg: "Artikel Tidak Ditemukan",
+//     });
+//   }
+// }
 
 async function updateArtikel(req, res) {
   try {
