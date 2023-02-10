@@ -18,15 +18,13 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      isActive: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      tempatLahir: {
+      passwrod: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
-      tanggalLahir: {
-        type: Sequelize.DATEONLY,
+      role: {
+        type: Sequelize.ENUM('guru','siswa'),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

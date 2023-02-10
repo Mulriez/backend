@@ -16,10 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       nama: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
-      isEmailVerified: DataTypes.STRING,
-      isActive: DataTypes.BOOLEAN,
-      tempatLahir: DataTypes.STRING,
-      tanggalLahir: DataTypes.DATEONLY,
+      role: DataTypes.ENUM('guru', 'siswa')
     },
     {
       sequelize,

@@ -8,17 +8,9 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
-const {
-  getProdList,
-  createProd,
-  getDetailProdByParams,
-  getDetailProdById,
-  updateProd,
-} = require("../controllers/produkController");
 const validationResultMiddleware = require("../middleware/validationResultMiddleware");
 //use filename+fuction
 const UserValidator = require("../validators/userValidator");
-const ProdukValidator = require("../validators/produkValidator");
 const jwtValidateMiddleware = require("../middleware/jwtValidateMiddleware");
 const {
   register,
@@ -39,23 +31,8 @@ const {
 
 //urutan (Untuk pembacaan code dari atas ke bawah)berpenaruh
 //produk
-router.get("/produk/list", getProdList),
-  router.get("/produk/detail/:id", getDetailProdById),
-  router.get("/produk/list/:brand", getDetailProdByParams),
-  router.post(
-    "/produk/create",
-    ProdukValidator.createProdValidator,
-    validationResultMiddleware,
-    createProd
-  ),
-  router.put(
-    "/produk/update/:id",
-    ProdukValidator.updateUserValidator,
-    validationResultMiddleware,
-    updateProd
-  ),
-  //register
-  router.post("/register", register);
+//register
+router.post("/register", register);
 //login
 router.post("/login", login);
 //update password
