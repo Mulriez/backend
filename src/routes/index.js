@@ -4,7 +4,7 @@ const router = express.Router();
 const validationResultMiddleware = require("../middleware/validationResultMiddleware");
 const jwtValidateMiddleware = require("../middleware/jwtValidateMiddleware");
 const { register, login} = require("../controllers/latiahnController");
-const { createMateri, updateMateri, deleteMateriMulti } = require("../controllers/materiController");
+const { createMateri, updateMateri, deleteMateriMulti, getListMateri } = require("../controllers/materiController");
 //urutan (Untuk pembacaan code dari atas ke bawah)berpenaruh
 //register
 router.post('/register', register)
@@ -15,6 +15,7 @@ router.post("/login", login);
 router.use(jwtValidateMiddleware);
 
 //materi
+router.get('/materi/list', getListMateri)
 router.post('/materi/create/multi', createMateri);
 router.put("/materi/update/:id", updateMateri);
 router.delete("/materi/multi/delete", deleteMateriMulti);
