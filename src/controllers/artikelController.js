@@ -2,6 +2,7 @@ const { promise } = require("bcrypt/promises");
 const { where } = require("sequelize");
 const { Op } = require("sequelize");
 const ArtikelModel = require("../models").artikel;
+const { checkQuery } = require("../utils");
 
 async function createArtikel(req, res) {
   try {
@@ -121,29 +122,46 @@ async function createArtikelBulk(req, res) {
 
 async function getAll(req, res) {
   try {
-    const { page, pageSize, offset, keyword, year, sortBy = "id", orderBy = "desc" } = req.query;
+    const {
+      page,
+      pageSize,
+      offset,
+      keyword,
+      year,
+      sortBy = "id",
+      orderBy = "desc",
+      isAll,
+    } = req.query;
     const artikel = await ArtikelModel.findAndCountAll({
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
-      // where: {
-      //   [Op.or]: [
-      //     {
-      //       title: {
-      //         [Op.substring]: keyword,
-      //       },
-      //     },
-      //     {
-      //       description: {
-      //         [Op.substring]: keyword,
-      //       },
-      //     },
-      //   ],
-      //   year:{
-      //     [Op.gte]: year
-      //   }
-      // },
-      order: [[sortBy,orderBy]],
+      where: {
+        ...(checkQuery(isAll) &&
+          isAll != 1 && {
+            userId: req.id,
+          }),
+        ...(checkQuery(keyword) && {
+          [Op.or]: [
+            {
+              title: {
+                [Op.substring]: keyword,
+              },
+            },
+            {
+              description: {
+                [Op.substring]: keyword,
+              },
+            },
+          ],
+        }),
+        ...(checkQuery(year) && {
+          year: {
+            [Op.gte]: year,
+          },
+        }),
+      },
+      order: [[sortBy, orderBy]],
       limit: pageSize,
       offset: offset,
       //offset bukan page
@@ -154,7 +172,7 @@ async function getAll(req, res) {
       pagination: {
         currentPage: page,
         pageSize: pageSize,
-        totalData: artikel.count
+        totalData: artikel.count,
       },
       data: artikel,
       query: {
