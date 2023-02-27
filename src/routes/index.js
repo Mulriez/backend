@@ -36,6 +36,7 @@ const {
   createArtikelMulti,
   deleteMulti,
 } = require("../controllers/artikelController");
+const getListNilai = require("../controllers/nilaiController");
 
 //urutan (Untuk pembacaan code dari atas ke bawah)berpenaruh
 //produk
@@ -88,6 +89,8 @@ router.get("/user/list", getListUser),
     updateUser
   ),
   router.delete("/user/delete/:id", deleteUser);
+//nilai
+router.get("/list/nilai", getListNilai)
 //artikel
 router.get("/artikel/list", getAll);
 router.post("/artikel/create/bulk", createArtikelBulk);

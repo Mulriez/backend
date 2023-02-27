@@ -1,9 +1,35 @@
 const UserModel = require("../models").user;
+const models = require("../models");
+const { Op } = require("sequelize");
+const { checkQuery } = require("../utils");
 
 //get
 async function getListUser(req, res) {
+  const { mapel } = req.query;
   try {
-    const users = await UserModel.findAll();
+    const users = await UserModel.findAll({
+      include: [
+        {
+          model: models.identitas,
+          require: true,
+          as: "identitas",
+          attributes: ["golonganDarah", "alamat"],
+        },
+        {
+          model: models.nilai,
+          require: true,
+          as: "nilai",
+          attributes: ["mapel", "nilai"],
+          where: {
+            ...(checkQuery(mapel) && {
+              mapel: {
+                [Op.substring]: mapel,
+              },
+            }),
+          },
+        },
+      ],
+    });
     res.json({
       status: "Success",
       msg: "DITEMUKAN",
@@ -46,7 +72,16 @@ async function createUser(req, res) {
 async function getDetailUserById(req, res) {
   try {
     const { id } = req.params;
-    const user = await UserModel.findByPk(id);
+    const user = await UserModel.findOne({
+      include: [
+        {
+          model: models.identitas,
+          require: true,
+          as: "identitas",
+          attributes: ["golonganDarah", "alamat"],
+        },
+      ],
+    });
     if (user === null) {
       res.status(404).json({
         status: "Fail",
